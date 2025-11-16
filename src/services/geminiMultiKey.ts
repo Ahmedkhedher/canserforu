@@ -129,20 +129,20 @@ class GeminiMultiKeyService {
    */
   private getFallbackResponse(userMessage: string): string {
     const fallbackResponses = [
-      "All AI services are currently experiencing high demand. For cancer-related questions, please consult with your healthcare provider for personalized advice.",
-      "The AI is temporarily overloaded across all servers. For urgent health concerns, please contact your doctor or a cancer helpline directly.",
-      "Due to high usage on all AI services, I can't process requests right now. Please try again in a few minutes, or consult reliable cancer resources.",
-      "All AI systems are busy. For immediate cancer support and information, consider visiting cancer.org or contacting your healthcare provider."
+      "AI services overloaded. Please consult your healthcare provider for personalized advice.",
+      "AI temporarily unavailable. Contact your doctor or cancer helpline for urgent concerns.",
+      "High usage detected. Try again shortly or consult reliable cancer resources.",
+      "AI busy. Visit cancer.org or contact your healthcare provider for immediate support."
     ];
 
     // Context-aware fallbacks
     const lowerMessage = userMessage.toLowerCase();
     if (lowerMessage.includes('food') || lowerMessage.includes('nutrition')) {
-      return "All AI services are overloaded. For nutrition guidance: Focus on a balanced diet with fruits, vegetables, and lean proteins. Consult a nutritionist for personalized cancer nutrition advice.";
+      return "AI overloaded. Nutrition tip: Balanced diet with fruits, vegetables, lean proteins. Consult nutritionist for personalized advice.";
     }
     
     if (lowerMessage.includes('pain') || lowerMessage.includes('symptom')) {
-      return "AI services are currently unavailable. For symptoms or pain management, please contact your healthcare provider immediately for proper evaluation and care.";
+      return "AI unavailable. For symptoms/pain, contact your healthcare provider immediately.";
     }
 
     return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
@@ -168,9 +168,9 @@ class GeminiMultiKeyService {
         const genAI = new GoogleGenerativeAI(keyConfig.key);
         const model = genAI.getGenerativeModel({ model: this.TEXT_MODEL });
         
-        const systemContext = `You are a compassionate AI assistant for a cancer awareness app. Provide helpful, empathetic information. Keep responses concise and encourage professional medical consultation when appropriate.`;
+        const systemContext = `Cancer support AI. Be empathetic, concise. Advise medical consultation when needed.`;
         
-        const prompt = `${systemContext}\n\nUser: ${userMessage}\n\nResponse:`;
+        const prompt = `${systemContext}\n\n${userMessage}`;
         
         const result = await model.generateContent(prompt);
         const response = result.response.text();
@@ -179,7 +179,7 @@ class GeminiMultiKeyService {
         this.updateKeyUsage(keyConfig);
         
         console.log(`✅ Success with ${keyConfig.name} (${keyConfig.requestCount} requests)`);
-        return response || 'I apologize, but I could not generate a response. Please try again.';
+        return response || 'Unable to generate response. Please try again.';
         
       } catch (error: any) {
         console.error(`❌ ${keyConfig.name} failed:`, error.message);
@@ -221,7 +221,7 @@ class GeminiMultiKeyService {
       const keyConfig = this.getNextAvailableKey();
       
       if (!keyConfig) {
-        return "All AI services are currently overloaded and can't analyze images. Please try again in a few minutes, or describe the food item for general nutritional guidance.";
+        return "AI services overloaded. Try again shortly or describe the food for nutrition guidance.";
       }
 
       try {
@@ -257,7 +257,7 @@ class GeminiMultiKeyService {
           };
         }
         
-        const prompt = userMessage || "Analyze this food image and provide brief nutritional guidance for cancer patients.";
+        const prompt = userMessage || "Identify food. Brief nutrition info for cancer patients. 3-4 sentences max.";
         
         const result = await model.generateContent([prompt, imagePart]);
         const response = result.response.text();
@@ -286,7 +286,7 @@ class GeminiMultiKeyService {
       }
     }
 
-    return "All AI services are overloaded and can't analyze images right now. Please describe the food item, and I'll provide general nutritional guidance for cancer patients.";
+    return "AI overloaded. Describe the food for nutrition guidance.";
   }
 
   /**
@@ -331,7 +331,9 @@ class GeminiMultiKeyService {
 const API_KEYS = [
   'AIzaSyAQrXYke4ORHRG32Jy_zHUUAsKjL-cGlBc', // Key 1
   'AIzaSyBTeu1xb7kHHNUskM4QCYnf9Iv4rPIZNWM', // Key 2
-  'AIzaSyBAdLsY1Gd5wzoAbf0p2NBcoJ8SZNpXb2M'  // Key 3
+  'AIzaSyBAdLsY1Gd5wzoAbf0p2NBcoJ8SZNpXb2M',
+  'AIzaSyBsX6Lj0YQTH9l7vNqpk2BIELKZ5Os9084',
+  'AIzaSyA_7DTQtmb956Ji1ZdvbQjT-tbk1b1ZAUI'  
 ];
 
 // Export multi-key service

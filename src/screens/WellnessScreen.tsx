@@ -10,10 +10,11 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { fetchDietAndWellness } from '../services/gemini';
+import { geminiMultiKey } from '../services/geminiMultiKey';
 import { theme } from '../ui/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Wellness'>;
@@ -28,23 +29,63 @@ const WellnessScreen: React.FC<Props> = ({ navigation, route }) => {
   const generate = async () => {
     setLoading(true);
     try {
-      const result = await fetchDietAndWellness({ cancerType: type, stage, age: String(age) });
-      const lines = result.suggestions.split('\n').map(l => l.trim());
-      const extract = (label: string) => {
-        const line = lines.find(l => l.toLowerCase().includes(label.toLowerCase()));
-        return line ? line.split(':')[1]?.trim() || line : 'No data available';
-      };
-      setSuggestions({
-        diet: extract('diet'),
-        hydration: extract('hydration'),
-        activity: extract('activity'),
-        sleep: extract('sleep'),
-      });
+      const prompt = `Create wellness plan for ${age}yo with ${type} cancer stage ${stage}.
+
+Return ONLY valid JSON:
+{
+  "diet": "2-3 concise sentences with specific foods",
+  "hydration": "2-3 concise sentences about water/beverages",
+  "activity": "2-3 concise sentences on exercise",
+  "sleep": "2-3 concise sentences on rest"
+}
+
+Be specific, actionable, brief.`;
+
+      const response = await geminiMultiKey.sendMessage(prompt);
+      
+      // Try to parse JSON response
+      try {
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          setSuggestions(parsed);
+        } else {
+          // Fallback: parse text response into categories
+          setSuggestions({
+            diet: extractSection(response, 'diet') || 'Focus on a balanced diet rich in fruits, vegetables, whole grains, and lean proteins.',
+            hydration: extractSection(response, 'hydration') || 'Drink 8-10 glasses of water daily and include herbal teas.',
+            activity: extractSection(response, 'activity') || 'Engage in 30 minutes of moderate exercise daily.',
+            sleep: extractSection(response, 'sleep') || 'Maintain 7-9 hours of quality sleep nightly.',
+          });
+        }
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        // Use the full response as diet recommendation
+        setSuggestions({
+          diet: response,
+          hydration: 'Drink 8-10 glasses water daily. Include herbal teas, fresh juices.',
+          activity: '30 min moderate exercise daily: walking, yoga, swimming.',
+          sleep: '7-9 hours nightly. Consistent bedtime routine, dark cool room.',
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error generating wellness plan:', error);
+      // Show fallback suggestions on error
+      setSuggestions({
+        diet: 'Pomegranate daily for antioxidants. Leafy greens (spinach, kale). Omega-3 fish twice weekly. Turmeric for anti-inflammatory benefits.',
+        hydration: '8-10 glasses water daily. Warm lemon water mornings. Green tea, chamomile throughout day.',
+        activity: '30 min daily: brisk walking, yoga, swimming. Strength training twice weekly. Deep breathing exercises.',
+        sleep: '7-9 hours nightly. Relaxing bedtime routine. No screens 1hr before bed. Cool, dark room.',
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const extractSection = (text: string, section: string): string | null => {
+    const regex = new RegExp(`${section}[:\\s]*([^\\n]+(?:\\n(?!\\d+\\.|[a-z]+:)[^\\n]+)*)`, 'i');
+    const match = text.match(regex);
+    return match ? match[1].trim() : null;
   };
 
   useEffect(() => {
@@ -125,16 +166,22 @@ const WellnessScreen: React.FC<Props> = ({ navigation, route }) => {
               ))}
             </View>
 
-            <Text style={styles.label}>Age: {age} years old</Text>
-            <View style={styles.ageSlider}>
-              <TouchableOpacity onPress={() => setAge(Math.max(18, age - 5))} style={styles.ageButton}>
-                <Ionicons name="remove" size={20} color={theme.colors.primary} />
-              </TouchableOpacity>
-              <Text style={styles.ageValue}>{age}</Text>
-              <TouchableOpacity onPress={() => setAge(Math.min(100, age + 5))} style={styles.ageButton}>
-                <Ionicons name="add" size={20} color={theme.colors.primary} />
-              </TouchableOpacity>
+            <Text style={styles.label}>Age</Text>
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderLabel}>18</Text>
+              <Slider
+                style={styles.slider}
+                minimumValue={18}
+                maximumValue={100}
+                value={age}
+                onValueChange={(value) => setAge(Math.round(value))}
+                minimumTrackTintColor={theme.colors.primary}
+                maximumTrackTintColor={theme.colors.border}
+                thumbTintColor={theme.colors.primary}
+              />
+              <Text style={styles.sliderLabel}>100</Text>
             </View>
+            <Text style={styles.ageDisplay}>{age} years old</Text>
 
             <TouchableOpacity 
               style={[styles.generateButton, loading && styles.generateButtonDisabled]}
@@ -280,27 +327,30 @@ const styles = StyleSheet.create({
   chipTextActive: {
     color: '#FFFFFF',
   },
-  ageSlider: {
+  sliderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     marginVertical: 16,
-    gap: 20,
+    paddingHorizontal: 8,
   },
-  ageButton: {
-    width: 40,
+  slider: {
+    flex: 1,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginHorizontal: 16,
   },
-  ageValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.colors.text,
-    minWidth: 60,
+  sliderLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.colors.subtext,
+    minWidth: 30,
     textAlign: 'center',
+  },
+  ageDisplay: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.primary,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   generateButton: {
     backgroundColor: theme.colors.primary,

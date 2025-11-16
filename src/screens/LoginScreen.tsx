@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableOpacity,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -74,10 +75,11 @@ const LoginScreenNew: React.FC = () => {
       >
         {/* Logo Section */}
         <View style={styles.logoSection}>
-          <View style={styles.logoCircle}>
-            <Ionicons name="heart" size={48} color="#FFFFFF" />
-          </View>
-          <Text style={styles.appName}>CanServe</Text>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.tagline}>Cancer Support Community</Text>
         </View>
 
@@ -202,6 +204,11 @@ const styles = StyleSheet.create({
   logoSection: {
     alignItems: 'center',
     marginBottom: 48,
+  },
+  logoImage: {
+    width: 280,
+    height: 180,
+    marginBottom: 12,
   },
   logoCircle: {
     width: 100,

@@ -1,0 +1,37 @@
+
+<svg width="1284" height="2778" viewBox="0 0 1284 2778" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="splashGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#50C9C3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4A90E2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="splashShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="15" stdDeviation="30" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1284" height="2778" fill="url(#splashGradient)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="200" cy="400" r="80" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="1000" cy="600" r="120" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="300" cy="1200" r="100" fill="rgba(255,255,255,0.06)"/>
+  <circle cx="900" cy="1800" r="90" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="150" cy="2200" r="110" fill="rgba(255,255,255,0.07)"/>
+  
+  <!-- Main ribbon symbol -->
+  <path d="M 642 1189
+           C 492 1089, 342 1289, 442 1589
+           C 492 1739, 592 1789, 642 1689
+           C 692 1789, 792 1739, 842 1589
+           C 942 1289, 792 1089, 642 1189 Z" 
+        fill="white" 
+        filter="url(#splashShadow)"/>
+  
+  <!-- App title -->
+  <text x="642" y="1789" text-anchor="middle" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="white">CanServe</text>
+  <text x="642" y="1869" text-anchor="middle" font-family="Arial, sans-serif" font-size="60" fill="rgba(255,255,255,0.9)">Cancer Awareness &amp; Support</text>
+  <text x="642" y="1929" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" fill="rgba(255,255,255,0.7)">Together We Fight</text>
+</svg>

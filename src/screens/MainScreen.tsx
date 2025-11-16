@@ -97,15 +97,11 @@ const MainScreen: React.FC<any> = ({ navigation }) => {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View style={styles.logoContainer}>
-            <LinearGradient
-              colors={[theme.colors.primary, '#0A66C2']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.logo}
-            >
-              <Ionicons name="heart" size={20} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.appName}>CanServe</Text>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.headerIcon}>
@@ -424,6 +420,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     ...theme.shadows.sm,
+  },
+  logoImage: {
+    width: 140,
+    height: 36,
   },
   appName: {
     fontSize: 22,

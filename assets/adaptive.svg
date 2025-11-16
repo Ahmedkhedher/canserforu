@@ -1,0 +1,20 @@
+
+<svg width="432" height="432" viewBox="0 0 432 432" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="adaptiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#50C9C3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="432" height="432" fill="url(#adaptiveGradient)"/>
+  
+  <!-- Ribbon symbol -->
+  <path d="M 216 136
+           C 156 116, 96 156, 136 256
+           C 156 316, 196 336, 216 296
+           C 236 336, 276 316, 296 256
+           C 336 156, 276 116, 216 136 Z" 
+        fill="white"/>
+</svg>
